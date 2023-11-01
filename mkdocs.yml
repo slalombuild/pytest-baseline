@@ -1,0 +1,12 @@
+site_name: pytest-baseline
+site_description: A plugin to accelerate writing highly repeatable tests
+site_author: Keith Knapp
+site_url: https://example.com/
+
+# theme: readthedocs
+
+repo_url: https://github.com/knappkeith/pytest-baseline
+
+nav:
+- Home: index.md
+- About: about.md
