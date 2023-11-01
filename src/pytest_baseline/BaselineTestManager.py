@@ -94,12 +94,6 @@ class BaselineTestManager:
 
         :param pytest.Config config: The pytest config object.
         """
-        # config._metadata["Environment"] = self.env
-        # config._metadata["Invoking Command"] = (
-        #     f"pytest {' '.join(config.invocation_params.args)}"[:250]
-        # )
-        # config._metadata["Start Time"] = time.strftime("%Y-%m-%dT%H:%M:%S")
-
         config.stash[metadata_key]["Environment"] = self.env
         config.stash[metadata_key]["Invoking Command"] = (
             f"pytest {' '.join(config.invocation_params.args)}"[:250]
