@@ -3,13 +3,13 @@ import warnings
 from typing import List
 
 import pytest
+from pytest_metadata.plugin import metadata_key
 from _pytest.compat import LEGACY_PATH
 from _pytest.config import Config
 from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Metafunc
 from _pytest.runner import CallInfo
-from py.xml import html
 
 from .helpers.framework import (
     FixtureExtraList, construct_parametrized_args_from_module_variable,
@@ -48,7 +48,8 @@ class BaselineTestManager:
     @property
     def has_html(self) -> bool:
         if self._has_html is None:
-            self._has_html = hasattr(self._config, "_html")
+            # self._has_html = hasattr(self._config, "_html")
+            self._has_html = True
         return self._has_html
 
     def pytest_report_header(self, config: Config, startdir: LEGACY_PATH):
@@ -93,11 +94,19 @@ class BaselineTestManager:
 
         :param pytest.Config config: The pytest config object.
         """
-        config._metadata["Environment"] = self.env
-        config._metadata["Invoking Command"] = (
+        # config._metadata["Environment"] = self.env
+        # config._metadata["Invoking Command"] = (
+        #     f"pytest {' '.join(config.invocation_params.args)}"[:250]
+        # )
+        # config._metadata["Start Time"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+
+        config.stash[metadata_key]["Environment"] = self.env
+        config.stash[metadata_key]["Invoking Command"] = (
             f"pytest {' '.join(config.invocation_params.args)}"[:250]
         )
-        config._metadata["Start Time"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+        config.stash[metadata_key]["Start Time"] = time.strftime(
+            "%Y-%m-%dT%H:%M:%S"
+        )
 
         if (
             hasattr(config.option, 'htmlpath')
@@ -115,23 +124,16 @@ class BaselineTestManager:
     def pytest_html_results_table_header(self, cells):
         """Adding columns to HTML Report, Description"""
         if self.add_description_html and self.has_html:
-            cells.append(
-                html.th("Descriptions", class_="sortable", col="descriptions"))
-            cells.append(
-                html.th(
-                    "Parametrization ID",
-                    class_="sortable",
-                    col="parametrization"
-                )
-            )
+            cells.insert(2, "<th>Desciption</th>")
+            cells.insert(1, '<th class="sortable">Parametrization ID</th>')
 
     def pytest_html_results_table_row(self, report, cells):
         """Adding values to columns of HTML Report, Description"""
         if self.add_description_html and self.has_html:
             if hasattr(report, "description"):
-                cells.append(html.td(report.description))
+                cells.insert(2, f"<td>{report.description}</td>")
             else:
-                cells.append(html.td("None"))
+                cells.insert(2, "<td>None</td>")
 
             # Add parametrization
             test_name = report.head_line
@@ -139,7 +141,7 @@ class BaselineTestManager:
                 param = test_name.split("[")[1][:-1]
             else:
                 param = "not a parametrized test"
-            cells.append(html.td(param))
+            cells.insert(1, f'<td>{param}</td>')
 
     def pytest_generate_tests(self, metafunc: Metafunc):
         """Generate (multiple) parametrized calls to a test function."""
@@ -256,7 +258,7 @@ class BaselineTestManager:
             if self.env not in env_names:
                 pytest.skip("test requires env in {!r}".format(env_names))
 
-    @pytest.hookimpl(tryfirst=True, hookwrapper=True)
+    @pytest.hookimpl(hookwrapper=True)
     def pytest_runtest_makereport(self, item: Item, call: CallInfo):
         """Called to create a :py:class:`_pytest.reports.TestReport` for each
         of the setup, call and teardown runtest phases of a test item.
@@ -324,10 +326,7 @@ class BaselineTestManager:
 
 def pytest_html_results_table_header(cells):
     """Adding columns to HTML Report, Description"""
-    cells.insert(
-        2,
-        html.th("Parametrization ID", class_="sortable", col="parametrization")
-    )
+    cells.insert(1, '<th class="sortable">Parametrization ID</th>')
 
 
 def pytest_html_results_table_row(report, cells):
@@ -337,4 +336,4 @@ def pytest_html_results_table_row(report, cells):
         param = test_name.split("[")[1][:-1]
     else:
         param = "not a parametrized test"
-    cells.insert(2, html.td(param))
+    cells.insert(1, f'<td>{param}</td>')

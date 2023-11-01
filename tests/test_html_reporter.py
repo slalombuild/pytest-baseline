@@ -34,7 +34,7 @@ def read_file(path: str) -> str:
 def test_html_report_created(testdir: Pytester):
     """Ensure that a HTML report is generated"""
     result, report = run(testdir, "report.html", "--fixtures", "-v")
-    result.stdout.fnmatch_lines(["*generated html file: file:*report.html*"])
+    result.stdout.fnmatch_lines(["*Generated html report: file:*report.html*"])
     assert report is not None
 
 
@@ -44,13 +44,13 @@ def test_html_report_doc_string_column(testdir: Pytester):
     doc_str = "This is my doc string for test_something function"
     testdir.makepyfile(
         f"""
-        def test_something():
+        def test_something(request):
             {doc_str_sep}{doc_str}{doc_str_sep}
             assert True
         """
     )
     result, report = run(testdir, "report.html", "-v")
-    assert f"<td>{doc_str}</td>" in report
+    assert f"{doc_str}" in report
     assert result.ret == 0
 
 
@@ -94,9 +94,9 @@ def test_html_report_extra_link_basic(testdir: Pytester):
 
     # Ensure Report includes reference to created extra
     assert (
-        f'<td class="col-links"><a class="text" href="{file_path}"' in report
+        fr'href=\&#34;{file_path}' in report
     )
-    assert ">api_config<" in report
+    assert "&#34;&gt;api_config&" in report
 
     # Read Extra Created and verify correct contents
     extra_str = read_file(testdir.tmpdir.join(file_path))
@@ -177,15 +177,15 @@ def test_html_report_extra_link_sub_dict(testdir: Pytester):
     assert (
         f'<td class="col-links"><a class="text" href="{file_path_1}"'
     )
-    assert ">fixture_extra<" in report
+    assert "&#34;&gt;fixture_extra&" in report
     assert (
         f'<td class="col-links"><a class="text" href="{file_path_2}"'
     )
-    assert ">DictKey1(fixture_extra)<" in report
+    assert "&#34;&gt;DictKey1(fixture_extra)&" in report
     assert (
         f'<td class="col-links"><a class="text" href="{file_path_3}"'
     )
-    assert ">DictKey3(fixture_extra)<" in report
+    assert "&#34;&gt;DictKey3(fixture_extra)&" in report
     assert "DictKey2(fixture_extra)" not in report
 
     # Read Extra Created and verify correct contents
@@ -282,21 +282,21 @@ def test_html_report_extra_link_multiple(testdir: Pytester):
     assert (
         f'<td class="col-links"><a class="text" href="{file_path_1}"'
     )
-    assert ">api_config<" in report
+    assert "&#34;&gt;api_config&" in report
     assert (
         f'<td class="col-links"><a class="text" href="{file_path_2}"'
     )
-    assert ">fixture_extra<" in report
+    assert "&#34;&gt;fixture_extra&" in report
     assert "DictKey2(fixture_extra)" not in report
 
     assert (
         f'<td class="col-links"><a class="text" href="{file_path_3}"'
     )
-    assert ">DictKey1(fixture_extra)<" in report
+    assert "&#34;&gt;DictKey1(fixture_extra)&" in report
     assert (
         f'<td class="col-links"><a class="text" href="{file_path_4}"'
     )
-    assert ">DictKey3(fixture_extra)<" in report
+    assert "&#34;&gt;DictKey3(fixture_extra)&" in report
     assert "DictKey2(fixture_extra)" not in report
 
     # Read Extra Created and verify correct contents
@@ -393,8 +393,8 @@ def test_html_report_extra_link_multiple_not_printed(testdir: Pytester):
     assert (
         f'<td class="col-links"><a class="text" href="{file_path_1}"'
     )
-    assert ">fixture_text_only<" in report
-    assert ">api_config<" not in report
+    assert "&#34;&gt;fixture_text_only&" in report
+    assert "&#34;&gt;api_config&" not in report
 
     # Read Extra Created and verify correct contents
     extra_str = read_file(testdir.tmpdir.join(file_path_1))
@@ -419,6 +419,6 @@ def test_html_report_environment(testdir: Pytester):
         testdir,
         "report-{date}-{env}.html", "-v", f"--env={env}"
     )
-    env_table = f"<td>{env}</td>"
+    env_table = f"&#34;{env}&#34"
     assert env_table in report
     assert result.ret == 0
