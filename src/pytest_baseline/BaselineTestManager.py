@@ -48,8 +48,10 @@ class BaselineTestManager:
     @property
     def has_html(self) -> bool:
         if self._has_html is None:
-            # self._has_html = hasattr(self._config, "_html")
-            self._has_html = True
+            if getattr(self._config.option, "htmlpath") is None:
+                self._has_html = False
+            else:
+                self._has_html = True
         return self._has_html
 
     def pytest_report_header(self, config: Config, startdir: LEGACY_PATH):
