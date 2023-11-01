@@ -16,6 +16,7 @@ from pytest_baseline.helpers.printing import (block_center_str,
                                               yesterday_stamp_utc)
 from types import GeneratorType
 
+
 class ObjWithBadStrMagicMethod:
     def __str__(self):
         return None
@@ -217,7 +218,7 @@ def test_center_dict_str_leave_line():
     """Ensure that a line with a key that starts with `LEAVE_LINE_AS_IS` is
     left alone and printed as is
     """
-    rand_str = "".join([str(randint(0,9)) for _ in range(randint(10, 100))])
+    rand_str = "".join([str(randint(0, 9)) for _ in range(randint(10, 100))])
     input = {
         "English": "Goodmorning",
         "LEAVE_LINE_AS_IS_A": rand_str,
