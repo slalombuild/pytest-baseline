@@ -138,8 +138,6 @@ def get_fixtures_of_type(
     fixtures_to_rtn = []
     request_fix = funcargs.get("request", None)
     for name, fixture in funcargs.items():
-        print()
-        print(name)
         if request_fix is not None:
             fixture_def = request_fix._fixture_defs.get(name)
             fixture_scope = getattr(fixture_def, "scope", "unknown")
@@ -154,7 +152,6 @@ def get_fixtures_of_type(
             )
 
         # Add all fixtures if they are of the correct type
-        print(fixture_dict)
         fixtures_to_rtn.extend(
             [
                 (
@@ -167,7 +164,6 @@ def get_fixtures_of_type(
                 if isinstance(f_value, fixture_type)
             ]
         )
-        print(fixtures_to_rtn)
     return fixtures_to_rtn
 
 
