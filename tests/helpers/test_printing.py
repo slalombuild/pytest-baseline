@@ -1,5 +1,6 @@
 from datetime import datetime
 from random import randint
+from types import GeneratorType
 
 import pytest
 
@@ -14,7 +15,6 @@ from pytest_baseline.helpers.printing import (block_center_str,
                                               today_stamp_utc,
                                               yesterday_datetime,
                                               yesterday_stamp_utc)
-from types import GeneratorType
 
 
 class ObjWithBadStrMagicMethod:

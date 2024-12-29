@@ -1,10 +1,9 @@
-
 import datetime
+import json
 import time
 from inspect import cleandoc
 from textwrap import indent
-from typing import Any, Dict, List, Optional, Union
-
+from typing import Any, Dict, Generator, List, Optional, Union
 
 NL = "\n"
 
@@ -38,33 +37,40 @@ def dir_str_of_object(
 
     obj_dir = [x for x in obj_dir if x not in filter_keys]
 
-    # Get label width
-    hdr_w = max([len(x) for x in obj_dir]) + 1
+    if len(obj_dir) > 0:
 
-    obj_dir = sorted(obj_dir)
+        # Get label width
+        hdr_w = max([len(x) for x in obj_dir]) + 1
 
-    def new_lines(item: Any, ind_len: int) -> str:
-        temp_rtn = str(item)
-        if f"{NL}" in temp_rtn:
-            return indent(temp_rtn, " " * ind_len)[ind_len:]
-        return temp_rtn
+        obj_dir = sorted(obj_dir)
 
-    def get_str_attribute(obj, attr):
-        attr_value = getattr(obj, attr)
-        try:
-            return str(attr_value)
-        except TypeError:
-            return f"TypeError: None {type(attr_value)}"
+        def new_lines(item: Any, ind_len: int) -> str:
+            temp_rtn = str(item)
+            if f"{NL}" in temp_rtn:
+                return indent(temp_rtn, " " * ind_len)[ind_len:]
+            return temp_rtn
 
-    # format and return string
-    val_ind = hdr_w + 3
-    attr_str = NL.join(
-        [
-            f"{x:{fill_char}>{hdr_w}} : "
-            f"{new_lines(get_str_attribute(obj, x), val_ind)[0:max_len]}"
-            for x in obj_dir if hasattr(obj, x)
-        ]
-    )
+        def get_str_attribute(obj, attr):
+            attr_value = getattr(obj, attr)
+            try:
+                return str(attr_value)
+            except TypeError:
+                return f"TypeError: None {type(attr_value)}"
+
+        # format and return string
+        val_ind = hdr_w + 3
+        attr_str = NL.join(
+            [
+                f"{x:{fill_char}>{hdr_w}} : "
+                f"{new_lines(get_str_attribute(obj, x), val_ind)[0:max_len]}"
+                for x in obj_dir if hasattr(obj, x)
+            ]
+        )
+    else:
+        attr_str = (
+            "No attributes to display, attributes may have been filtered by "
+            f"`filter_`(passed:{filter_}) and `filter__`(passed:{filter__})"
+        )
     return f"{NL}{type(obj)}:{NL}{attr_str}{NL}"
 
 
@@ -73,14 +79,32 @@ def center_dict_str(
     delimiter: str = " : ",
     fill: str = " ",
     indent_len: int = 0,
-    key_justification: str = ">"
+    key_justification: str = ">",
+    value_justification: str = "<"
 ) -> str:
     """Generates the string for a Dictionary centering on the delimiter between
     the Key and Value, Values whose __str__ method returns a string with `\n`
-    will be indented to fit in Value column
+    will be indented to fit in Value column.  Any sub dictionaries will be centered and
+    indented to fit in the Value column.  Any sub item that is JSON Serializable will
+    be json.dump'd indented to fit in the Value column.
     """
     def new_lines(item: Any, ind_len: int) -> str:
-        temp_rtn = str(item)
+        if isinstance(item, dict):
+            return center_dict_str(
+                item,
+                delimiter=delimiter,
+                fill=fill,
+                indent_len=ind_len,
+                key_justification=key_justification,
+                value_justification=value_justification
+            )[ind_len:]
+        if isinstance(item, list):
+            try:
+                temp_rtn = json_dumps(item, indent=4)
+            except Exception:
+                temp_rtn = str(item)
+        else:
+            temp_rtn = str(item)
         if f"{NL}" in temp_rtn:
             temp_rtn = cleandoc(temp_rtn)
             return indent(temp_rtn, " " * ind_len)[ind_len:]
@@ -89,7 +113,8 @@ def center_dict_str(
     def get_str_value(obj, key):
         key_value = obj.get(key)
         try:
-            return str(key_value)
+            str(key_value)
+            return key_value
         except TypeError:
             return f"TypeError: None {type(key_value)}"
 
@@ -99,20 +124,26 @@ def center_dict_str(
     hdr_w = max(
         [
             len(str(k)) for k in data.keys()
-            if not k.startswith("LEAVE_LINE_AS_IS")
+            if not str(k).startswith("LEAVE_LINE_AS_IS")
         ]
     )
     val_ind = hdr_w + len(delimiter) + indent_len
+    val_w = max([
+        len(i)
+        for k, v in data.items()
+        if not str(k).startswith("LEAVE_LINE_AS_IS")
+        for i in new_lines(v, 0).split("\n")
+    ])
     ind_str = f"{'':{fill}^{indent_len}}"
-    return NL.join(
-        [
+    return NL.join([
+        (
             f"{ind_str}{str(k):{fill}{key_justification}{hdr_w}}{delimiter}"
-            f"{new_lines(get_str_value(data, k), val_ind)}"
-            if not k.startswith("LEAVE_LINE_AS_IS")
-            else f"{ind_str}{get_str_value(data, k)}"
-            for k, v in data.items()
-        ]
-    )
+            f"{new_lines(get_str_value(data, k), val_ind):{value_justification}{val_w}}"
+        ).rstrip(" ")
+        if not str(k).startswith("LEAVE_LINE_AS_IS")
+        else f"{ind_str}{str(get_str_value(data, k)):{value_justification}{val_w}}"
+        for k in data.keys()
+    ])
 
 
 def block_center_str(data: str, split_delimiter: str = ":", **kwargs):
@@ -221,13 +252,22 @@ def generate_table(
 
 
 def generate_table_iter(
-        headers: List[str],
-        content: List[List[str]],
-        border: bool = True,
-        column_padding: int = 0,
-        justification: Union[str, List[str]] = "^",
-        use_checks: bool = False):
+    headers: Union[List[str], None],
+    content: List[List[str]],
+    border: bool = True,
+    column_padding: int = 0,
+    justification: Union[str, List[str]] = "^",
+    use_checks: bool = False,
+    cell_limit: int = 500
+) -> Generator[str, None, None]:
     """Returns a printable Table line that has the formatting and spacing"""
+
+    # Check for No Headers
+    if headers is None:
+        include_header = False
+        headers = ["" for _ in range(max([len(x) for x in content if x != "break"]))]
+    else:
+        include_header = True
 
     # Check for correct Types
     if not isinstance(headers, list):
@@ -264,7 +304,7 @@ def generate_table_iter(
             for item_index, line_item in enumerate(line):
                 split_nl = str(line_item).split("\n")
                 max_width = max(
-                    [len(x) for x in split_nl]
+                    [len(x) if len(x) <= cell_limit else cell_limit for x in split_nl]
                 )
                 if (max_width > widths[item_index]):
                     widths[item_index] = max_width
@@ -281,7 +321,7 @@ def generate_table_iter(
                     if len(cell) <= nl_cnt:
                         nl_line.append("")
                     else:
-                        nl_line.append(cell[nl_cnt])
+                        nl_line.append(cell[nl_cnt][0:cell_limit])
                 new_content.append(nl_line)
         else:
             new_content.append(line)
@@ -329,8 +369,9 @@ def generate_table_iter(
         )
 
     # Add Header and Divider
-    yield header_line.format(x=[str(x) for x in headers])
-    yield divider.format(x=["" for x in headers])
+    if include_header:
+        yield header_line.format(x=[str(x) for x in headers])
+        yield divider.format(x=["" for x in headers])
 
     # Add Line Items
     for line in new_content:
@@ -372,3 +413,85 @@ def secs_to_str(seconds: Union[int, float]) -> str:
             secs=str(int(secs)),
             milli=str(milli_secs))
     return rtn_str
+
+
+class CustomEncoder(json.JSONEncoder):
+    def default(self, obj):
+        """Default Encoder that will try to just provide the string value if not JSON
+        Serizable
+        """
+        try:
+            rtn_encoded = json.JSONEncoder.default(self, obj)
+        except TypeError:
+            rtn_encoded = str(obj)
+        else:
+            raise
+        return rtn_encoded
+
+
+def json_dumps(obj, *args, **kwargs):
+    """JSON dumps wrapper that will auto indent and a Custom Encoder to print more
+    pythonic objects
+    """
+    if "indent" not in kwargs:
+        kwargs["indent"] = 2
+    if "cls" not in kwargs:
+        kwargs["cls"] = CustomEncoder
+    return json.dumps(obj, *args, **kwargs)
+
+
+def list_compare_printout(
+    list_names: List[str],
+    list_1: List[str],
+    list_2: List[str],
+    *args
+) -> str:
+    """Generates a table printout of a list comparison"""
+    full_set = set()
+    full_set.update(list_1)
+    full_set.update(list_2)
+    for extra_list in args:
+        full_set.update(extra_list)
+    list_o_lists = [list_1, list_2, *args]
+    output = []
+    for item in sorted(list(full_set)):
+        line = []
+        for sub_list in list_o_lists:
+            if item in sub_list:
+                line.append(item)
+            else:
+                line.append("--")
+        output.append(line)
+    return generate_table(list_names, output)
+
+
+def generate_list_strings(
+    list_of_strs: List[str],
+    title: str,
+    list_format: str = "  {index:>{padding}} - {item}"
+):
+    """Returns a New line delimited string in the following:
+    {TITLE}[:]
+      ## - ITEM 0
+      ## - ITEM 1
+      ...
+    """
+    padding = len(str(len(list_of_strs)))
+    rtn_str = f"{title}{':' if not title.endswith(':') else ''}\n"
+    if len(list_of_strs) == 0:
+        rtn_str += "    - No Items in List."
+    rtn_str += "\n".join([
+        list_format.format(item=item, index=index + 1, padding=padding)
+        for index, item in enumerate(list_of_strs)
+    ])
+    return rtn_str
+
+
+def generate_list_count_table(list_o_values: List[Any], **kwargs) -> str:
+    """Counts all the unique values in a list of values and returns a table with the
+    counts of each value, sorted by the number of each (highest to lowest) the items
+    in the list must be hashable
+    """
+    values = [[x, list_o_values.count(x)] for x in set(list_o_values)]
+    values.sort(key=lambda x: x[1], reverse=True)
+    return generate_table(["Value", "Count"], values, **kwargs)

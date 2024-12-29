@@ -5,20 +5,19 @@ Pytest Plugin to help develop and manage highly repeatable tests by leveraging c
 ## Feature Overview
 --------
 
-* TODO
-
-
-## Requirements
-------------
-
-* TODO
-
+* Configuration driven common tests for highly repeatable tests.
+* Expansions on the pytest-html pytest plugin
 
 ## Installation
 ------------
 
-* How to install from atlassian
+* In the future this package will be available on pypi, however this repo must be publically available first.
 * How to copy and install local
+    - Clone This Repo to your local machine
+    - In your project's virtual environment run:
+    ````
+    pip install {PATH_TO_CLONED REPO}
+    ````
 
 
 ## Basic Usage

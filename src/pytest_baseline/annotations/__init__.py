@@ -1,25 +1,26 @@
-from typing import Any, Callable, List, Optional, Tuple, Union
+from typing import (Any, Callable, List, Literal, Optional, Tuple, TypedDict,
+                    Union)
+
 from _pytest.nodes import Item
 from _pytest.runner import CallInfo
-
-from pytest_html import extras
 
 FixtureInfoItem = Tuple[str, Any, Optional[Callable]]
 FixtureInfoType = List[FixtureInfoItem]
 
-HtmlExtraType = Optional[Union[
-    extras.extra,
-    extras.html,
-    extras.image,
-    extras.jpg,
-    extras.json,
-    extras.mp4,
-    extras.png,
-    extras.svg,
-    extras.text,
-    extras.url,
-    extras.video,
-]]
+class HtmlExtraReturnType(TypedDict):
+    name: str
+    format_type: str
+    content: Any
+    mime_type: str
+    extension: str
+
+HtmlExtraType = Optional[Callable[[
+    Any,
+    Literal["html", "image", "json", "text", "url", "video"],
+    Optional[str],
+    Optional[str],
+    Optional[str]
+], HtmlExtraReturnType]]
 
 FixtureExtraPrintFunc = Optional[Callable[
     [Any, str, str, str, Item, CallInfo],
