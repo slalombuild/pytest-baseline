@@ -1,3 +1,7 @@
+[![Pytest_logo](https://github.com/user-attachments/assets/a7102128-2300-4b4f-a829-62efe3d28668)](https://docs.pytest.org/en/stable/#)
+
+https://commons.wikimedia.org/wiki/File:Pytest_logo.svg
+
 # pytest-baseline
 
 Pytest Plugin to help develop and manage highly repeatable tests by leveraging common test classes and functions.
@@ -7,6 +11,7 @@ Pytest Plugin to help develop and manage highly repeatable tests by leveraging c
 
 * Configuration driven common tests for highly repeatable tests.
 * Expansions on the pytest-html pytest plugin
+* Helpful printing methods for generating table outputs, comparisons and other formatted output
 
 ## Installation
 ------------
@@ -395,6 +400,25 @@ Distributed under the terms of the _MIT_ license, "pytest-baseline" is free and 
 ------
 
 If you encounter any problems, please _file an issue_ along with a detailed description.
+
+## Slalom Build
+------
+
+This plugin was developed in house at Slalom Build.
+
+Interested in joining the team checkout our Careers [page](https://www.slalombuild.com/en-gb/careers)
+
+Check us out on Social Media
+
+* [LinkedIn](https://www.linkedin.com/company/slalom-build)
+* [Instagram](https://www.instagram.com/slalombuild/)
+* [Threads](https://www.threads.net/@slalombuild)
+* [X](https://twitter.com/slalombuild)
+
+## Tools
+------
+
+This repo was built with the help of the following tools:
 
 - `Cookiecutter`: https://github.com/audreyr/cookiecutter
 - `@hackebrot`: https://github.com/hackebrot

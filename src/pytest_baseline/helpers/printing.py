@@ -130,9 +130,9 @@ def center_dict_str(
     val_ind = hdr_w + len(delimiter) + indent_len
     val_w = max([
         len(i)
-        for k, v in data.items()
+        for k in data.keys()
         if not str(k).startswith("LEAVE_LINE_AS_IS")
-        for i in new_lines(v, 0).split("\n")
+        for i in new_lines(get_str_value(data, k), 0).split("\n")
     ])
     ind_str = f"{'':{fill}^{indent_len}}"
     return NL.join([
