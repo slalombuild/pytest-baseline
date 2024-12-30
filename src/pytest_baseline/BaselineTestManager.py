@@ -124,6 +124,7 @@ class BaselineTestManager:
                 date=time.strftime("%Y-%m-%dT%H-%M"),
                 env=self.env
             )
+            print("i'm here", self.env, config.option.htmlpath)
 
         config.addinivalue_line(
             "markers", "env(name): mark test to run only on named environment"
