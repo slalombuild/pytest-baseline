@@ -113,10 +113,13 @@ class BaselineTestManager:
             "%Y-%m-%dT%H:%M:%S"
         )
 
+        from helpers.printing import dir_str_of_object
+        print("LOOK HERE", dir_str_of_object(config.option))
         if (
             hasattr(config.option, 'htmlpath')
             and config.option.htmlpath is not None
         ):
+
             config.option.htmlpath = config.option.htmlpath.format(
                 date=time.strftime("%Y-%m-%dT%H-%M"),
                 env=self.env

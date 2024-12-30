@@ -12,6 +12,10 @@ def run(
     path = testdir.tmpdir.join(path)
     result = testdir.runpytest("--html", path, *args)
     new_path = get_new_report_path(result, testdir)
+    try:
+        read_file(new_path)
+    except Exception:
+        print("PROBLEM", result.stdout)
     return result, read_file(new_path)
 
 
