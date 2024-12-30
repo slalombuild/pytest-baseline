@@ -16,6 +16,8 @@ from pytest_baseline.helpers.printing import (block_center_str,
                                               yesterday_datetime,
                                               yesterday_stamp_utc)
 
+NL = "\n"
+
 
 class ObjWithBadStrMagicMethod:
     def __str__(self):
@@ -229,7 +231,7 @@ def test_center_dict_str_leave_line():
     output = center_dict_str(input)
     print(output)
     assert isinstance(output, str)
-    assert rand_str in output.split("\n")
+    assert rand_str in output.split(NL)
 
 
 def test_center_dict_str_new_lines():

@@ -7,12 +7,14 @@ from _pytest.runner import CallInfo
 FixtureInfoItem = Tuple[str, Any, Optional[Callable]]
 FixtureInfoType = List[FixtureInfoItem]
 
+
 class HtmlExtraReturnType(TypedDict):
     name: str
     format_type: str
     content: Any
     mime_type: str
     extension: str
+
 
 HtmlExtraType = Optional[Callable[[
     Any,

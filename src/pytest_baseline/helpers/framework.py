@@ -39,9 +39,10 @@ def fixture_print_wrapper(
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            print(f"{f'[ START {func.__module__}.{func.__name__} ]':{char}^{length}}")
+            mod = func.__module__
+            print(f"{f'[ START {mod}.{func.__name__} ]':{char}^{length}}")
             val = func(*args, **kwargs)
-            print(f"{f'[ END {func.__module__}.{func.__name__} ]':{char}^{length}}")
+            print(f"{f'[ END {mod}.{func.__name__} ]':{char}^{length}}")
             return val
 
         if isgeneratorfunction(func):

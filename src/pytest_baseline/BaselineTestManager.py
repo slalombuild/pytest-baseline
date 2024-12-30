@@ -1,7 +1,7 @@
 import time
 import warnings
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 import pytest
 from _pytest.config import Config
@@ -54,9 +54,13 @@ class BaselineTestManager:
                 self._has_html = True
         return self._has_html
 
-    def pytest_report_header(self, config: Config, start_path: Path) -> str | list[str]:
-        """Return a string or list of strings to be displayed as header info for
-        terminal reporting.
+    def pytest_report_header(
+        self,
+        config: Config,
+        start_path: Path
+    ) -> Union[str, List[str]]:
+        """Return a string or list of strings to be displayed as header info
+        for terminal reporting.
 
         :param config: The pytest config object.
         :param start_path: The starting dir.
@@ -65,15 +69,15 @@ class BaselineTestManager:
 
         .. note::
 
-            Lines returned by a plugin are displayed before those of plugins which
-            ran before it.
+            Lines returned by a plugin are displayed before those of plugins
+            which ran before it.
             If you want to have your line(s) displayed first, use
             :ref:`trylast=True <plugin-hookorder>`.
 
         .. versionchanged:: 7.0.0
             The ``start_path`` parameter was added as a :class:`pathlib.Path`
-            equivalent of the ``startdir`` parameter. The ``startdir`` parameter
-            has been deprecated.
+            equivalent of the ``startdir`` parameter. The ``startdir``
+            parameter has been deprecated.
 
         Use in conftest plugins
         =======================

@@ -82,11 +82,12 @@ def center_dict_str(
     key_justification: str = ">",
     value_justification: str = "<"
 ) -> str:
-    """Generates the string for a Dictionary centering on the delimiter between
-    the Key and Value, Values whose __str__ method returns a string with `\n`
-    will be indented to fit in Value column.  Any sub dictionaries will be centered and
-    indented to fit in the Value column.  Any sub item that is JSON Serializable will
-    be json.dump'd indented to fit in the Value column.
+    """Generates the string for a Dictionary centering on the delimiter
+    between the Key and Value, Values whose __str__ method returns a string
+    with `\n` will be indented to fit in Value column.  Any sub dictionaries
+    will be centered and indented to fit in the Value column.  Any sub item
+    that is JSON Serializable will be json.dump'd indented to fit in the Value
+    column.
     """
     def new_lines(item: Any, ind_len: int) -> str:
         if isinstance(item, dict):
@@ -135,13 +136,14 @@ def center_dict_str(
         for i in new_lines(get_str_value(data, k), 0).split("\n")
     ])
     ind_str = f"{'':{fill}^{indent_len}}"
+    val_just = value_justification
     return NL.join([
         (
             f"{ind_str}{str(k):{fill}{key_justification}{hdr_w}}{delimiter}"
-            f"{new_lines(get_str_value(data, k), val_ind):{value_justification}{val_w}}"
+            f"{new_lines(get_str_value(data, k), val_ind):{val_just}{val_w}}"
         ).rstrip(" ")
         if not str(k).startswith("LEAVE_LINE_AS_IS")
-        else f"{ind_str}{str(get_str_value(data, k)):{value_justification}{val_w}}"
+        else f"{ind_str}{str(get_str_value(data, k)):{val_just}{val_w}}"
         for k in data.keys()
     ])
 
@@ -265,7 +267,9 @@ def generate_table_iter(
     # Check for No Headers
     if headers is None:
         include_header = False
-        headers = ["" for _ in range(max([len(x) for x in content if x != "break"]))]
+        headers = [
+            "" for _ in range(max([len(x) for x in content if x != "break"]))
+        ]
     else:
         include_header = True
 
@@ -303,9 +307,10 @@ def generate_table_iter(
             # max_nl = max([len(str(x).split("\n")) for x in line])
             for item_index, line_item in enumerate(line):
                 split_nl = str(line_item).split("\n")
-                max_width = max(
-                    [len(x) if len(x) <= cell_limit else cell_limit for x in split_nl]
-                )
+                max_width = max([
+                    len(x) if len(x) <= cell_limit else cell_limit
+                    for x in split_nl
+                ])
                 if (max_width > widths[item_index]):
                     widths[item_index] = max_width
 
@@ -417,8 +422,8 @@ def secs_to_str(seconds: Union[int, float]) -> str:
 
 class CustomEncoder(json.JSONEncoder):
     def default(self, obj):
-        """Default Encoder that will try to just provide the string value if not JSON
-        Serizable
+        """Default Encoder that will try to just provide the string value if
+        not JSON Serizable
         """
         try:
             rtn_encoded = json.JSONEncoder.default(self, obj)
@@ -430,8 +435,8 @@ class CustomEncoder(json.JSONEncoder):
 
 
 def json_dumps(obj, *args, **kwargs):
-    """JSON dumps wrapper that will auto indent and a Custom Encoder to print more
-    pythonic objects
+    """JSON dumps wrapper that will auto indent and a Custom Encoder to print
+    more pythonic objects
     """
     if "indent" not in kwargs:
         kwargs["indent"] = 2
@@ -488,9 +493,9 @@ def generate_list_strings(
 
 
 def generate_list_count_table(list_o_values: List[Any], **kwargs) -> str:
-    """Counts all the unique values in a list of values and returns a table with the
-    counts of each value, sorted by the number of each (highest to lowest) the items
-    in the list must be hashable
+    """Counts all the unique values in a list of values and returns a table
+    with the counts of each value, sorted by the number of each (highest
+    to lowest) the items in the list must be hashable
     """
     values = [[x, list_o_values.count(x)] for x in set(list_o_values)]
     values.sort(key=lambda x: x[1], reverse=True)
