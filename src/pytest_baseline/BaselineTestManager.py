@@ -119,7 +119,7 @@ class BaselineTestManager:
             hasattr(config.option, 'htmlpath')
             and config.option.htmlpath is not None
         ):
-
+            print("i'm here", self.env, config.option.htmlpath)
             config.option.htmlpath = config.option.htmlpath.format(
                 date=time.strftime("%Y-%m-%dT%H-%M"),
                 env=self.env
