@@ -17,7 +17,7 @@ def run(
 
 def get_new_report_path(result, testdir):
     print(testdir)
-    print(result)
+    print(result.stdout)
     new_path = testdir.tmpdir.join(
         str(result.stdout).split(str(testdir.tmpdir))[-1].split(" ")[0]
     )
