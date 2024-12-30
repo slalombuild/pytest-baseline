@@ -1,9 +1,9 @@
-<p float="left">
-  <img src="https://github.com/user-attachments/assets/a7102128-2300-4b4f-a829-62efe3d28668" width="100" />
-  <img src="https://github.com/user-attachments/assets/a7102128-2300-4b4f-a829-62efe3d28668" width="100" />
+<p float="left" text-align="center">
+  <img src="https://github.com/user-attachments/assets/9d115953-94e1-4000-9af5-f31349b191f2" width="250" />
+  <img src="https://github.com/user-attachments/assets/e3aae659-890c-4ad6-996a-8d88d4f07002" width="100" height="250" />
+  <img src="https://github.com/user-attachments/assets/a7102128-2300-4b4f-a829-62efe3d28668" width="250" />
 </p>
 
-<!-- [![Pytest_logo](https://github.com/user-attachments/assets/a7102128-2300-4b4f-a829-62efe3d28668) + ![Pytest_logo](https://github.com/user-attachments/assets/a7102128-2300-4b4f-a829-62efe3d28668)] -->
 # pytest-baseline
 
 
