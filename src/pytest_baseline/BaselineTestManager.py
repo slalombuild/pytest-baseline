@@ -113,7 +113,7 @@ class BaselineTestManager:
             "%Y-%m-%dT%H:%M:%S"
         )
 
-        from helpers.printing import dir_str_of_object
+        from .helpers.printing import dir_str_of_object
         print("LOOK HERE", dir_str_of_object(config.option))
         if (
             hasattr(config.option, 'htmlpath')
