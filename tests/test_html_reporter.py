@@ -1,4 +1,6 @@
 from typing import Tuple
+from urllib.parse import unquote
+
 from _pytest.pytester import RunResult
 from pytest import Pytester
 
@@ -18,6 +20,8 @@ def get_new_report_path(result, testdir):
     new_path = testdir.tmpdir.join(
         str(result.stdout).split(str(testdir.tmpdir))[-1].split(" ")[0]
     )
+    if "%" in new_path:
+        new_path = unquote(new_path)
     return new_path
 
 
