@@ -1,15 +1,15 @@
 import time
 import warnings
-from typing import List
+from pathlib import Path
+from typing import List, Union
 
 import pytest
-from pytest_metadata.plugin import metadata_key
-from _pytest.compat import LEGACY_PATH
 from _pytest.config import Config
 from _pytest.main import Session
 from _pytest.nodes import Item
 from _pytest.python import Metafunc
 from _pytest.runner import CallInfo
+from pytest_metadata.plugin import metadata_key
 
 from .helpers.framework import (
     FixtureExtraList, construct_parametrized_args_from_module_variable,
@@ -54,12 +54,18 @@ class BaselineTestManager:
                 self._has_html = True
         return self._has_html
 
-    def pytest_report_header(self, config: Config, startdir: LEGACY_PATH):
+    def pytest_report_header(
+        self,
+        config: Config,
+        start_path: Path
+    ) -> Union[str, List[str]]:
         """Return a string or list of strings to be displayed as header info
         for terminal reporting.
 
-        :param _pytest.config.Config config: The pytest config object.
-        :param py.path.local startdir: The starting dir.
+        :param config: The pytest config object.
+        :param start_path: The starting dir.
+        :type start_path: pathlib.Path
+        :param startdir: The starting dir (deprecated).
 
         .. note::
 
@@ -68,12 +74,15 @@ class BaselineTestManager:
             If you want to have your line(s) displayed first, use
             :ref:`trylast=True <plugin-hookorder>`.
 
-        .. note::
+        .. versionchanged:: 7.0.0
+            The ``start_path`` parameter was added as a :class:`pathlib.Path`
+            equivalent of the ``startdir`` parameter. The ``startdir``
+            parameter has been deprecated.
 
-            This function should be implemented only in plugins or
-            ``conftest.py`` files situated at the tests root directory due to
-            how pytest
-            :ref:`discovers plugins during startup <pluginorder>`.
+        Use in conftest plugins
+        =======================
+
+        This hook is only called for :ref:`initial conftests <pluginorder>`.
         """
         # Obtain for format logo
         hdr_lines = []

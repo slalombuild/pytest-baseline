@@ -1,10 +1,11 @@
 import functools
+from inspect import isgeneratorfunction
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import pytest
 from _pytest.fixtures import FixtureRequest
 from _pytest.nodes import Item
-from _pytest.python import Metafunc
+from _pytest.python import Metafunc, Module
 from _pytest.runner import CallInfo
 from pytest_html import extras
 
@@ -14,18 +15,41 @@ from ..annotations import (FixtureExtraFilterFunc, FixtureExtraPrintFunc,
 NL = "\n"
 
 
-def fixture_print_wrapper(func: Callable[..., Any]) -> Callable[..., Any]:
-    """Wraps a fixture to print out the start and end of a fixture executing
-    to help in log traces, decorator must be placed after `@pytest.fixture`
-    decorator
-    """
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        print(f"{f'< START {func.__name__} >':-^100}")
-        val = func(*args, **kwargs)
-        print(f"{f'< END {func.__name__} >':-^100}")
-        return val
-    return wrapper
+def fixture_print_wrapper(
+    char: str = "-",
+    length: int = 100
+) -> Callable[[Callable[..., Any]], Any]:
+    def fixture_print_wrapper(func: Callable[..., Any]) -> Callable[..., Any]:
+        """Wraps a fixture to print out the start and end of a fixture
+        executing to help in log traces, decorator must be placed after
+        `@pytest.fixture` decorator.  This decorator will work for both yield
+        and regular return fixtures
+        """
+        @functools.wraps(func)
+        def yield_wrapper(*args, **kwargs):
+            f_name = f"{func.__module__}.{func.__name__}"
+            print(
+                f"{f'[ START Yield {f_name} ]':{char}^{length}}"
+            )
+            val = yield from func(*args, **kwargs)
+            print(
+                f"{f'[ END Yield {f_name} ]':{char}^{length}}"
+            )
+            return val
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            mod = func.__module__
+            print(f"{f'[ START {mod}.{func.__name__} ]':{char}^{length}}")
+            val = func(*args, **kwargs)
+            print(f"{f'[ END {mod}.{func.__name__} ]':{char}^{length}}")
+            return val
+
+        if isgeneratorfunction(func):
+            return yield_wrapper
+        else:
+            return wrapper
+    return fixture_print_wrapper
 
 
 def check_duplicate_keys_list_of_dict(
@@ -45,7 +69,8 @@ def get_module_defined_configuration(
     request_obj: Union[FixtureRequest, Metafunc, Item],
     config_name: str,
     default: Optional[Any] = None,
-    skip_if_not_defined: Optional[bool] = False
+    skip_if_not_defined: Optional[bool] = False,
+    override_module: Optional[Module] = None
 ) -> Any:
     """Returns the value stored in the module for the specific variable name
     or the default.  Will return the environment dependent version if it
@@ -53,7 +78,10 @@ def get_module_defined_configuration(
     end of the variable,
     example: cloud_secrets_config_qal or cloud_secrets_config_Qal
     """
-    module = request_obj.module
+    if override_module is None:
+        module = request_obj.module
+    else:
+        module = override_module
 
     # get configured test environment
     env = (
@@ -71,7 +99,7 @@ def get_module_defined_configuration(
             return getattr(module, var_name)
     if skip_if_not_defined:
         pytest.skip(
-            f"`{config_name}` not defined for `{request_obj.module.__name__}`"
+            f"`{config_name}` not defined for `{module.__name__}`"
         )
     return default
 
@@ -91,6 +119,7 @@ def construct_parametrized_args_from_module_variable(
     root_name: str,
     skip_value: Any,
     id_func: Optional[Callable] = None,
+    is_indirect: bool = False
 ) -> Dict[str, Union[str, List[Any], Callable]]:
     """Constructs the arguments to be passed to parametrized marker for a
     fixture based on module variable. The module variable must be named
@@ -122,7 +151,12 @@ def construct_parametrized_args_from_module_variable(
             configured_values = [configured_values]
         params = configured_values
 
-    return {"argnames": f"{root_name}_value", "argvalues": params, "ids": ids}
+    return {
+        "argnames": f"{root_name}_value",
+        "argvalues": params,
+        "indirect": is_indirect,
+        "ids": ids
+    }
 
 
 def get_fixtures_of_type(

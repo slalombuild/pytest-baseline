@@ -1,4 +1,9 @@
-![Pytest_logo](https://github.com/user-attachments/assets/a7102128-2300-4b4f-a829-62efe3d28668)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9d115953-94e1-4000-9af5-f31349b191f2" width="250" />
+  <img src="https://github.com/user-attachments/assets/e3aae659-890c-4ad6-996a-8d88d4f07002" width="100" height="250" />
+  <img src="https://github.com/user-attachments/assets/a7102128-2300-4b4f-a829-62efe3d28668" width="250" />
+</p>
+
 # pytest-baseline
 
 
@@ -7,20 +12,20 @@ Pytest Plugin to help develop and manage highly repeatable tests by leveraging c
 ## Feature Overview
 --------
 
-* TODO
-
-
-## Requirements
-------------
-
-* TODO
-
+* Configuration driven common tests for highly repeatable tests.
+* Expansions on the pytest-html pytest plugin
+* Helpful printing methods for generating table outputs, comparisons and other formatted output
 
 ## Installation
 ------------
 
-* How to install from atlassian
+* In the future this package will be available on pypi, however this repo must be publically available first.
 * How to copy and install local
+    - Clone This Repo to your local machine
+    - In your project's virtual environment run:
+    ````
+    pip install {PATH_TO_CLONED REPO}
+    ````
 
 
 ## Basic Usage
@@ -398,6 +403,25 @@ Distributed under the terms of the _MIT_ license, "pytest-baseline" is free and 
 ------
 
 If you encounter any problems, please _file an issue_ along with a detailed description.
+
+## Slalom Build
+------
+
+This plugin was developed in house at Slalom Build.
+
+Interested in joining the team checkout our Careers [page](https://www.slalombuild.com/en-gb/careers)
+
+Check us out on Social Media
+
+* [LinkedIn](https://www.linkedin.com/company/slalom-build)
+* [Instagram](https://www.instagram.com/slalombuild/)
+* [Threads](https://www.threads.net/@slalombuild)
+* [X](https://twitter.com/slalombuild)
+
+## Tools
+------
+
+This repo was built with the help of the following tools:
 
 - `Cookiecutter`: https://github.com/audreyr/cookiecutter
 - `@hackebrot`: https://github.com/hackebrot
