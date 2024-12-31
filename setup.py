@@ -28,7 +28,7 @@ setup(
     python_requires='>=3.5',
     install_requires=[
         'pytest>=7.1.2',
-        "pytest-html==4.0.0"
+        "pytest-html==4.1.0"
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

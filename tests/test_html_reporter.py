@@ -1,5 +1,4 @@
 from typing import Tuple
-import os
 from _pytest.pytester import RunResult
 from pytest import Pytester
 
