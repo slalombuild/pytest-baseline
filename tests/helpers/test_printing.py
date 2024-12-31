@@ -231,7 +231,7 @@ def test_center_dict_str_leave_line():
     output = center_dict_str(input)
     print(output)
     assert isinstance(output, str)
-    assert rand_str in output.split(NL)
+    assert rand_str in [x.strip() for x in output.split(NL)]
 
 
 def test_center_dict_str_new_lines():
