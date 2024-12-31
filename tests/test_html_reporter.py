@@ -15,7 +15,10 @@ def run(
     try:
         read_file(new_path)
     except Exception:
+        import os
+        print(", ".join([x for x in os.listdir(testdir) if os.path.isfile(os.path.join(testdir, x))]))
         print("PROBLEM", result.stdout)
+
     return result, read_file(new_path)
 
 
