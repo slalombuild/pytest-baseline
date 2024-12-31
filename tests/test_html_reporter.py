@@ -1,5 +1,5 @@
 from typing import Tuple
-
+import os
 from _pytest.pytester import RunResult
 from pytest import Pytester
 
@@ -16,7 +16,6 @@ def run(
     try:
         read_file(new_path)
     except Exception:
-        import os
         print("PROBLEM", result.stdout)
     print("PROBLEM ")
     print(", ".join([x for x in os.listdir(str(testdir.tmpdir)) if os.path.isfile(os.path.join(str(testdir.tmpdir), x))]))
