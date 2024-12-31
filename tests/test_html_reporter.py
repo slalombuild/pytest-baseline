@@ -20,9 +20,9 @@ def get_new_report_path(result, testdir):
     new_path = testdir.tmpdir.join(
         str(result.stdout).split(str(testdir.tmpdir))[-1].split(" ")[0]
     )
-    if "%" in new_path:
-        new_path = unquote(new_path)
-    return new_path
+    if "%" in str(new_path):
+        new_path = unquote(str(new_path))
+    return str(new_path)
 
 
 def read_file(path: str) -> str:
